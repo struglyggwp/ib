@@ -1,0 +1,59 @@
+name: praktika-ib
+
+x-portal-container: &portal-container
+  image: praktika-ib:1.1
+  pull_policy: never
+  init: true
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  restart: unless-stopped
+  dns: [127.0.0.1]
+
+x-web-health: &web-health
+  test:
+    - CMD
+    - python
+    - -c
+    - |
+      from http.client import HTTPConnection
+      connection = HTTPConnection("127.0.0.1", 8080, timeout=2)
+      connection.request("GET", "/healthz")
+      assert connection.getresponse().status == 200
+  interval: 5s
+  timeout: 3s
+  retries: 3
+
+services:
+  app:
+    <<: *portal-container
+    environment:
+      HOST: 0.0.0.0
+      PORT: "8080"
+      DATA_DIR: /data
+      PORTAL_DOMAIN: ${PORTAL_DOMAIN:-corp.example.test}
+      PORTAL_ORIGIN: ${PORTAL_ORIGIN:-http://127.0.0.1:8080}
+    volumes:
+      - practice-data:/data
+    networks: [practice]
+    healthcheck: *web-health
+  web:
+    <<: *portal-container
+    command: ["python", "relay.py"]
+    depends_on:
+      app:
+        condition: service_healthy
+    networks: [ingress, practice]
+    ports:
+      - "127.0.0.1:${PORTAL_PORT:-8080}:8080"
+    healthcheck: *web-health
+
+volumes:
+  practice-data:
+
+networks:
+  ingress:
+    driver: bridge
+  practice:
+    driver: bridge
+    internal: true
