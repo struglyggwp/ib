@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Шаблоны писем — Awareness{% endblock %}
+{% block content %}
+<div class="page-head"><div><h1>Шаблоны писем</h1><div class="muted">Библиотека учебных материалов для согласованных кампаний</div></div><a class="btn btn-primary" href="{% url 'email_template_create' %}">＋ Новый шаблон</a></div>
+<div class="panel">
+<form method="get" class="toolbar">
+<input class="form-control" style="max-width:300px;flex:1" type="search" name="q" value="{{ query }}" placeholder="Название, тема или тег">
+<select class="form-select" style="max-width:240px" name="category"><option value="">Все категории</option>{% for value,label in categories %}<option value="{{ value }}" {% if selected_category == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+<select class="form-select" style="max-width:180px" name="status"><option value="">Все статусы</option>{% for value,label in statuses %}<option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+<button class="btn btn-primary" type="submit">Найти</button><a class="btn" href="{% url 'email_template_list' %}">Сбросить</a>
+</form>
+<div class="table-wrap"><table><thead><tr><th>Название</th><th>Категория</th><th>Тема письма</th><th>Теги</th><th>Статус</th><th>Изменён</th></tr></thead><tbody>
+{% for item in templates %}<tr><td><a class="table-link" href="{% url 'email_template_detail' item.pk %}">{{ item.name }}</a></td><td>{{ item.get_category_display }}</td><td>{{ item.subject }}</td><td>{{ item.tags|default:"—" }}</td><td><span class="badge">{{ item.get_status_display }}</span></td><td>{{ item.updated_at|date:"d.m.Y H:i" }}</td></tr>{% empty %}<tr><td colspan="6"><div class="empty">Шаблонов пока нет. Создайте первый учебный шаблон.</div></td></tr>{% endfor %}
+</tbody></table></div></div>
+{% endblock %}
