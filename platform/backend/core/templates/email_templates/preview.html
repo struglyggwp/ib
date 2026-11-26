@@ -1,9 +1,0 @@
-{% extends "base.html" %}
-{% block title %}Предпросмотр: {{ item.name }} — Awareness{% endblock %}
-{% block content %}
-<div class="page-head"><div><h1>Предпросмотр письма</h1><div class="muted">{{ item.name }} · демонстрационные данные, реальная отправка не выполняется</div></div><div class="btn-row"><a class="btn" href="{% url 'email_template_detail' item.pk %}">← К шаблону</a><a class="btn btn-primary" href="{% url 'email_template_edit' item.pk %}">Изменить</a></div></div>
-<div class="panel"><div class="kv"><span class="muted">Тема</span><strong>{{ preview_subject }}</strong></div><div class="help">Данные получателя ниже являются тестовыми.</div><div class="preview-mail">{% if preview_html %}{{ preview_html|safe }}{% else %}<pre>{{ preview_text }}</pre>{% endif %}</div>{% if preview_html and preview_text %}<details><summary>Показать текстовую альтернативу</summary><pre class="code-preview">{{ preview_text }}</pre></details>{% endif %}</div>
-<div class="panel"><h2>Страница по ссылке</h2><strong>Корпоративное обучение по ИБ</strong>{{ page_preview|safe }}</div>
-<div class="panel"><h2>Подставленные тестовые данные</h2><div class="table-wrap"><table><tbody>{% for key,value in variables.items %}<tr><th>{{ key }}</th><td>{{ value }}</td></tr>{% endfor %}</tbody></table></div></div>
-{% if recipients %}<form class="panel" method="post" action="{% url 'template_test' item.pk %}">{% csrf_token %}<label>Тестовый ящик <select name="recipient">{% for recipient in recipients %}<option>{{ recipient }}</option>{% endfor %}</select></label> <button class="btn btn-primary">Отправить тестовое письмо</button><p>Страница по ссылке доступна сотрудникам после перевода шаблона в статус «Активный».</p></form>{% endif %}
-{% endblock %}

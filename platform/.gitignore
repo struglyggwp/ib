@@ -1,6 +1,0 @@
-.env
-__pycache__/
-*.py[cod]
-staticfiles/
-media/
-.pytest_cache/
